@@ -16,6 +16,18 @@ public class LibDbRepository implements LibRepository {
         this.connection = connection;
     }
 
+    public void createUserBookTable() {
+        // Implementation for creating the user_book table in the database
+    }
+
+    public void createBookTable() {
+        // Implementation for creating the book table in the database
+    }
+
+    public void createUserTable() {
+        // Implementation for creating the user table in the database
+    }
+
     @Override
     public void addUserBook(UserBook userBook) {
 
