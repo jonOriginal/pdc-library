@@ -1,27 +1,23 @@
 package com.pdc.library.models;
 
 public class User {
-    private int userID;
-    private String userName;
+    private final int Id;
+    private String Name;
 
     public User() {
-        this.userID = 0;
-        this.userName = "";
+        this.Id = 0;
+        this.Name = "";
     }
 
-    public int getUserID() {
-        return userID;
-    }
-
-    public void setUserID(int newUserID) {
-        this.userID = newUserID;
+    public int getUserId() {
+        return Id;
     }
 
     public String getName() {
-        return userName;
+        return Name;
     }
 
-    public void setUserName(String newUserName) {
-        this.userName = newUserName;
+    public void setName(String newUserName) {
+        this.Name = newUserName;
     }
 }

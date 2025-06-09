@@ -1,22 +1,22 @@
 package com.pdc.library.models;
 
 public class Book {
-    private int bookID;
+    private int Id;
     private String bookAuthor;
     private String bookName;
 
     public Book() {
-        this.bookID = 0;
+        this.Id = 0;
         this.bookAuthor = "";
         this.bookName = "";
     }
 
-    public int getBookID() {
-        return bookID;
+    public int getId() {
+        return Id;
     }
 
-    public void setBookID(int newBookID) {
-       this.bookID = newBookID;
+    public void setId(int newBookID) {
+       this.Id = newBookID;
     }
 
     public String getBookAuthor() {
