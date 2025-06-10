@@ -19,22 +19,64 @@ public class LibDbRepository implements LibRepository {
         this.connection = connection;
     }
 
+    private List<Book> dummyBooks() {
+        return List.of(
+            new Book(1, "Author A", "Book A"),
+            new Book(2, "Author B", "Book B"),
+            new Book(3, "Author C", "Book C")
+        );
+    }
+
+    private List<User> dummyUsers() {
+        return List.of(
+            new User(1, "User A"),
+            new User(2, "User B"),
+            new User(3, "User C")
+        );
+    }
+
+    private List<UserBook> dummyUserBooks() {
+        return List.of(
+            new UserBook(1, 1),
+            new UserBook(2, 2),
+            new UserBook(3, 3)
+        );
+    }
+
     public void createUserBookTable() throws SQLException {
         // Implementation for creating the user_book table in the database
         Statement statement = connection.createStatement();
-        statement.execute(LibSql.CREATE_USER_BOOK_TABLE);
+        if (statement.execute(LibSql.CREATE_USER_BOOK_TABLE)) {
+            for (var userBook : dummyUserBooks()) {
+                addUserBook(userBook);
+            }
+        } else {
+            System.out.println("User book table already exists.");
+        }
     }
 
     public void createBookTable() throws SQLException {
         // Implementation for creating the book table in the database
         Statement statement = connection.createStatement();
-        statement.execute(LibSql.CREATE_BOOK_TABLE);
+        if (statement.execute(LibSql.CREATE_BOOK_TABLE)) {
+            for (var book : dummyBooks() ) {
+                addBook(book);
+            }
+        } else {
+            System.out.println("Book table already exists.");
+        }
     }
 
     public void createUserTable() throws SQLException {
         // Implementation for creating the user table in the database
         Statement statement = connection.createStatement();
-        statement.execute(LibSql.CREATE_USER_TABLE);
+        if (statement.execute(LibSql.CREATE_USER_TABLE)) {
+            for (var user : dummyUsers()) {
+                addUser(user);
+            }
+        } else {
+            System.out.println("User table already exists.");
+        }
     }
 
     @Override
@@ -84,8 +126,8 @@ public class LibDbRepository implements LibRepository {
 
         // Inserted values:
         pstmt.setInt(1, book.getId());
-        pstmt.setString(2, book.getBookAuthor());
-        pstmt.setString(3, book.getBookName());
+        pstmt.setString(2, book.getAuthor());
+        pstmt.setString(3, book.getName());
         pstmt.executeUpdate();
     }
 
@@ -118,7 +160,7 @@ public class LibDbRepository implements LibRepository {
         PreparedStatement pstmt = connection.prepareStatement(insertSQL);
 
         // Inserted values:
-        pstmt.setInt(1, user.getUserId());
+        pstmt.setInt(1, user.getId());
         pstmt.setString(2, user.getName());
         pstmt.executeUpdate();
     }

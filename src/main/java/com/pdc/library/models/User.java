@@ -4,24 +4,20 @@ public class User {
     private final int Id;
     private String Name;
 
-    public User() {
-        this.Id = 0;
-        this.Name = "";
+    public User(int id, String name) {
+        this.Id = id;
+        this.Name = name;
     }
 
-    public int getUserId() {
+    public int getId() {
         return Id;
-    }
-
-    public void setUserId(int newUserId) {
-        this.Id = newUserId;
     }
 
     public String getName() {
         return Name;
     }
 
-    public void setName(String newUserName) {
-        this.Name = newUserName;
+    public void setName(String name) {
+        this.Name = name;
     }
 }
