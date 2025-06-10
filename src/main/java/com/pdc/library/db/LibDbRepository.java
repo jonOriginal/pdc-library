@@ -7,8 +7,8 @@ import com.pdc.library.models.UserBook;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -18,6 +18,16 @@ public class LibDbRepository implements LibRepository {
 
     public LibDbRepository(Connection connection) {
         this.connection = connection;
+    }
+
+    private static List<User> parseUsers(ResultSet resultSet) throws SQLException {
+        var users = new java.util.ArrayList<User>();
+        while (resultSet.next()) {
+            var id = resultSet.getInt("UserID");
+            var name = resultSet.getString("UserName");
+            users.add(new User(id, name));
+        }
+        return users;
     }
 
     private List<Book> dummyBooks() {
@@ -38,9 +48,9 @@ public class LibDbRepository implements LibRepository {
 
     private List<UserBook> dummyUserBooks() {
         return List.of(
-                new UserBook(1, 1),
-                new UserBook(2, 2),
-                new UserBook(3, 3)
+                UserBook.create(1, 1, 7),
+                UserBook.create(2, 2, 7),
+                UserBook.create(3, 3, 7)
         );
     }
 
@@ -106,23 +116,85 @@ public class LibDbRepository implements LibRepository {
     }
 
     @Override
-    public Collection<UserBook> findUserBooksByUserId(int userId) {
-        return List.of();
+    public void updateUserBook(UserBook userBook) throws SQLException {
+        var pstmt = connection.prepareStatement(LibSql.UPDATE_USER_BOOK);
+        pstmt.setInt(1, userBook.getUserId());
+        pstmt.setInt(2, userBook.getBookId());
+        pstmt.setDate(3, userBook.getDateHired());
+        pstmt.setInt(4, userBook.getAllowedDays());
+        pstmt.executeUpdate();
     }
 
     @Override
-    public UserBook findUserBookByBookId(int bookId) {
+    public Collection<UserBook> findUserBooksByUserId(int userId) throws SQLException {
+        var pstmt = connection.prepareStatement(LibSql.SELECT_USER_BOOKS_BY_USER_ID);
+        pstmt.setInt(1, userId);
+        var resultSet = pstmt.executeQuery();
+        return parseUserBooks(resultSet);
+    }
+
+    private Collection<UserBook> parseUserBooks(ResultSet resultSet) throws SQLException {
+        var userBooks = new java.util.ArrayList<UserBook>();
+        while (resultSet.next()) {
+            int userId = resultSet.getInt("UserID");
+            int bookId = resultSet.getInt("BookID");
+            var dateHired = resultSet.getDate("DateHired");
+            int allowedDays = resultSet.getInt("AllowedDays");
+            var bookTitle = resultSet.getString("BookName");
+            var bookAuthor = resultSet.getString("BookAuthor");
+            var userName = resultSet.getString("UserName");
+
+            var userBook = new UserBook(userId, bookId, dateHired, allowedDays, bookTitle, bookAuthor, userName);
+            userBooks.add(userBook);
+        }
+        return userBooks;
+    }
+
+    @Override
+    public UserBook findUserBookByBookId(int bookId) throws SQLException {
+        var pstmt = connection.prepareStatement(LibSql.SELECT_USER_BOOK_BY_BOOK_ID);
+        pstmt.setInt(1, bookId);
+        var resultSet = pstmt.executeQuery();
+        if (resultSet.next()) {
+            int userId = resultSet.getInt("UserID");
+            var dateHired = resultSet.getDate("DateHired");
+            int allowedDays = resultSet.getInt("AllowedDays");
+            var bookTitle = resultSet.getString("BookName");
+            var bookAuthor = resultSet.getString("BookAuthor");
+            var userName = resultSet.getString("UserName");
+
+            return new UserBook(userId, bookId, dateHired, allowedDays, bookTitle, bookAuthor, userName);
+        }
         return null;
     }
 
     @Override
-    public Collection<UserBook> findOverdueBooks() {
-        return List.of();
+    public Collection<UserBook> findOverdueBooks() throws SQLException {
+        var pstmt = connection.prepareStatement(LibSql.SELECT_ALL_USER_BOOKS);
+        var resultSet = pstmt.executeQuery();
+        var uB =  parseUserBooks(resultSet);
+        if (uB.isEmpty()) {
+            return List.of();
+        }
+        return filterOverdueBooks(uB);
+    }
+
+    private static List<UserBook> filterOverdueBooks(Collection<UserBook> ubs) {
+        return ubs.stream()
+                .filter(userBook -> {
+                    var c = java.util.Calendar.getInstance();
+                    c.setTime(userBook.getDateHired());
+                    c.add(java.util.Calendar.DATE, userBook.getAllowedDays());
+                    return c.getTime().after(java.util.Calendar.getInstance().getTime());
+                })
+                .toList();
     }
 
     @Override
-    public Collection<UserBook> findOverdueBooksByUserId(int userId) {
-        return List.of();
+    public Collection<UserBook> findAllUserBooks() throws SQLException {
+        var pstmt = connection.prepareStatement(LibSql.SELECT_ALL_USER_BOOKS);
+        var resultSet = pstmt.executeQuery();
+        return parseUserBooks(resultSet);
     }
 
     @Override
@@ -142,7 +214,15 @@ public class LibDbRepository implements LibRepository {
     }
 
     @Override
-    public Book findBookById(int id) {
+    public Book findBookById(int id) throws SQLException {
+        var pstmt = connection.prepareStatement(LibSql.SELECT_BOOK_BY_ID);
+        pstmt.setInt(1, id);
+        var resultSet = pstmt.executeQuery();
+        if (resultSet.next()) {
+            var author = resultSet.getString("BookAuthor");
+            var name = resultSet.getString("BookName");
+            return new Book(id, author, name);
+        }
         return null;
     }
 
@@ -150,24 +230,28 @@ public class LibDbRepository implements LibRepository {
     public Collection<Book> findBookByTitle(String title) throws SQLException {
         var pstmt = connection.prepareStatement(LibSql.FIND_BOOK_BY_TITLE);
         pstmt.setString(1, "%" + title + "%");
-        return getBooks(pstmt);
+        return parseBooks(pstmt);
     }
 
-    private Collection<Book> getBooks(PreparedStatement pstmt) throws SQLException {
+    private Collection<Book> parseBooks(PreparedStatement pstmt) throws SQLException {
         var resultSet = pstmt.executeQuery();
-        List<Book> books = new java.util.ArrayList<>();
+        var books = new java.util.ArrayList<Book>();
         while (resultSet.next()) {
             int id = resultSet.getInt("BookID");
-            String author = resultSet.getString("BookAuthor");
-            String name = resultSet.getString("BookName");
+            var author = resultSet.getString("BookAuthor");
+            var name = resultSet.getString("BookName");
             books.add(new Book(id, author, name));
         }
         return books;
     }
 
     @Override
-    public void updateBook(Book book) {
-
+    public void updateBook(Book book) throws SQLException {
+        var pstmt = connection.prepareStatement(LibSql.UPDATE_BOOK);
+        pstmt.setString(1, book.getAuthor());
+        pstmt.setString(2, book.getName());
+        pstmt.setInt(3, book.getId());
+        pstmt.executeUpdate();
     }
 
     @Override
@@ -180,9 +264,23 @@ public class LibDbRepository implements LibRepository {
 
     @Override
     public void removeUser(int userId) throws SQLException {
-        String deleteSQL = "DELETE FROM " + LibSql.USER_TABLE_NAME + " WHERE UserID = '?'";
-        var pstmt = connection.prepareStatement(deleteSQL);
+        var pstmt = connection.prepareStatement(LibSql.DELETE_USER);
         pstmt.setInt(1, userId);
+        pstmt.executeUpdate();
+    }
+
+    @Override
+    public Collection<User> findAllUsers() throws SQLException {
+        var pstmt = connection.prepareStatement(LibSql.SELECT_ALL_USERS);
+        var resultSet = pstmt.executeQuery();
+        return parseUsers(resultSet);
+    }
+
+    @Override
+    public void updateUser(User user) throws SQLException {
+        var pstmt = connection.prepareStatement(LibSql.UPDATE_USER);
+        pstmt.setString(1, user.getName());
+        pstmt.setInt(2, user.getId());
         pstmt.executeUpdate();
     }
 
@@ -192,19 +290,16 @@ public class LibDbRepository implements LibRepository {
     }
 
     @Override
-    public Collection<User> findUserByName(String name) {
-        return List.of();
+    public Collection<User> findUserByName(String name) throws SQLException {
+        var pstmt = connection.prepareStatement(LibSql.FIND_USER_BY_NAME);
+        pstmt.setString(1, "%" + name + "%");
+        var resultSet = pstmt.executeQuery();
+        return parseUsers(resultSet);
     }
 
     @Override
-    public Collection<Book> findAllBooks() {
-        try {
-            String selectSQL = "SELECT * FROM " + LibSql.BOOK_TABLE_NAME;
-            var pstmt = connection.prepareStatement(selectSQL);
-            return getBooks(pstmt);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return List.of();
-        }
+    public Collection<Book> findAllBooks() throws SQLException {
+        var pstmt = connection.prepareStatement(LibSql.SELECT_ALL_BOOKS);
+        return parseBooks(pstmt);
     }
 }

@@ -8,10 +8,10 @@ import java.util.Collection;
 public interface LibRepository extends BookRepository, UserRepository {
     void addUserBook(UserBook userBook) throws SQLException;
     void removeUserBook(int bookId) throws SQLException;
+    void updateUserBook(UserBook userBook) throws SQLException;
 
-    Collection<UserBook> findUserBooksByUserId(int userId);
-    UserBook findUserBookByBookId(int bookId);
-
-    Collection<UserBook> findOverdueBooks();
-    Collection<UserBook> findOverdueBooksByUserId(int userId);
+    Collection<UserBook> findUserBooksByUserId(int userId) throws SQLException;
+    UserBook findUserBookByBookId(int bookId) throws SQLException;
+    Collection<UserBook> findOverdueBooks() throws SQLException;
+    Collection<UserBook> findAllUserBooks() throws SQLException;
 }
