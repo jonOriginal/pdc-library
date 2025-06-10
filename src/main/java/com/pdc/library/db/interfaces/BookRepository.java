@@ -8,10 +8,8 @@ import java.util.Collection;
 public interface BookRepository {
     void addBook(Book book) throws SQLException;
     void removeBook(int bookId) throws SQLException;
-    void updateBook(Book book);
-
-    Collection<Book> findAllBooks();
-
-    Book findBookById(int id);
-    Collection<Book> findBookByTitle(String title);
+    void updateBook(Book book) throws SQLException;
+    Collection<Book> findAllBooks() throws SQLException;
+    Book findBookById(int id) throws SQLException;
+    Collection<Book> findBookByTitle(String title) throws SQLException;
 }
