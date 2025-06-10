@@ -17,8 +17,8 @@ public class UserMenu extends Menu {
     private final UserRepository repo;
     private final JPanel userListPanel;
 
-    public UserMenu(Listener<MenuAction> listener, UserRepository repository) {
-        super(listener);
+    public UserMenu(Listener<MenuAction> menuListener, UserRepository repository) {
+        super(menuListener);
         this.repo = repository;
 
         this.setLayout(new BorderLayout());

@@ -1,14 +1,11 @@
 package com.pdc.library.view.user;
 
-import com.pdc.library.db.interfaces.UserRepository;
 import com.pdc.library.models.User;
 
 import javax.swing.*;
 import java.util.function.Consumer;
 
 public class AddUserDialog extends JDialog {
-
-    private UserRepository repository;
 
     public AddUserDialog(Consumer<User> onUserAdded) {
         setTitle("Add User");
