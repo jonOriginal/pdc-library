@@ -16,11 +16,11 @@ public class Book {
     }
 
     public void setId(int id) {
-       this.Id = id;
+        this.Id = id;
     }
 
     public String getAuthor() {
-       return author;
+        return author;
     }
 
     public void setAuthor(String author) {

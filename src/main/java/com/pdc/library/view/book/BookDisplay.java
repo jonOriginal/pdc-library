@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 
 public class BookDisplay extends JPanel {
 
-    public BookDisplay(Book book, Consumer<Integer> deleteAction, Consumer<Book> editAction) {
+    public BookDisplay(Book book, Consumer<Integer> deleteAction, Consumer<Book> editAction, Consumer<Book> viewLoansAction) {
         this.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
         setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
 
@@ -31,11 +31,17 @@ public class BookDisplay extends JPanel {
             editAction.accept(book);
         });
 
+        var viewLoansButton = new JButton("View Loan");
+        viewLoansButton.addActionListener(e -> {
+            viewLoansAction.accept(book);
+        });
+
         add(idLabel);
         add(titleLabel);
         add(authorLabel);
         add(deleteButton);
         add(editButton);
+        add(viewLoansButton);
     }
 
     private void onDeleteClicked(Book book, Consumer<Integer> deleteAction) {

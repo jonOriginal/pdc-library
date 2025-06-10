@@ -3,6 +3,7 @@ package com.pdc.library.view.book;
 import com.pdc.library.db.interfaces.BookRepository;
 import com.pdc.library.models.Book;
 import com.pdc.library.util.Listener;
+import com.pdc.library.util.Navigate;
 import com.pdc.library.view.Menu;
 import com.pdc.library.view.MenuAction;
 import com.pdc.library.view.SearchBar;
@@ -19,7 +20,7 @@ public class BookMenu extends Menu {
 
     private final JPanel bookListPanel;
 
-    public BookMenu(Listener<MenuAction> menuListener, BookRepository repository) {
+    public BookMenu(Listener<Navigate> menuListener, BookRepository repository) {
         super(menuListener);
         this.setLayout(new BorderLayout());
         this.repository = repository;
@@ -49,7 +50,7 @@ public class BookMenu extends Menu {
 
         var backButton = new JButton("Back");
         backButton.addActionListener(e -> {
-            listener.onEvent(MenuAction.HOME);
+            listener.onEvent(Navigate.targetless(MenuAction.HOME));
         });
 
         var addButton = new JButton("Add Book");
@@ -110,9 +111,13 @@ public class BookMenu extends Menu {
         }
     }
 
+    private void onViewLoans(Book book) {
+        listener.onEvent(new Navigate(MenuAction.LOANS, "books/" + book.getId()));
+    }
+
     private List<BookDisplay> getBookPanels(Collection<Book> books) {
         return books.stream()
-                .map(book -> new BookDisplay(book, this::deleteBook, this::editBook))
+                .map(book -> new BookDisplay(book, this::deleteBook, this::editBook, this::onViewLoans))
                 .toList();
     }
 

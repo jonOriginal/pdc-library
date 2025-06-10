@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 
 public class UserDisplay extends JPanel {
 
-    public UserDisplay(User user, Consumer<User> deleteAction, Consumer<User> editAction) {
+    public UserDisplay(User user, Consumer<User> deleteAction, Consumer<User> editAction, Consumer<User> viewLoansAction) {
         this.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
         setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
 
@@ -27,11 +27,17 @@ public class UserDisplay extends JPanel {
             editAction.accept(user);
         });
 
+        var viewLoansButton = new JButton("View Loans");
+        viewLoansButton.addActionListener(e -> {
+            viewLoansAction.accept(user);
+        });
+
         editButton.setForeground(Color.BLUE);
         add(idLabel);
         add(titleLabel);
         add(deleteButton);
         add(editButton);
+        add(viewLoansButton);
     }
 
 

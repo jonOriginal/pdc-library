@@ -3,6 +3,7 @@ package com.pdc.library.view.user;
 import com.pdc.library.db.interfaces.UserRepository;
 import com.pdc.library.models.User;
 import com.pdc.library.util.Listener;
+import com.pdc.library.util.Navigate;
 import com.pdc.library.view.Menu;
 import com.pdc.library.view.MenuAction;
 import com.pdc.library.view.SearchBar;
@@ -17,7 +18,7 @@ public class UserMenu extends Menu {
     private final UserRepository repo;
     private final JPanel userListPanel;
 
-    public UserMenu(Listener<MenuAction> menuListener, UserRepository repository) {
+    public UserMenu(Listener<Navigate> menuListener, UserRepository repository) {
         super(menuListener);
         this.repo = repository;
 
@@ -58,7 +59,7 @@ public class UserMenu extends Menu {
 
         var backButton = new JButton("Back");
         backButton.addActionListener(e -> {
-            listener.onEvent(MenuAction.HOME);
+            listener.onEvent(Navigate.targetless(MenuAction.HOME));
         });
 
         var searchBar = new SearchBar(
@@ -144,9 +145,13 @@ public class UserMenu extends Menu {
         clear();
     }
 
+    private void onViewLoans(User user) {
+        listener.onEvent(new Navigate(MenuAction.LOANS, "users/" + user.getId()));
+    }
+
     private List<UserDisplay> getUserPanels(Collection<User> users) {
         return users.stream()
-                .map(user -> new UserDisplay(user, this::showDeleteDialog, this::showEditUserDialog))
+                .map(user -> new UserDisplay(user, this::showDeleteDialog, this::showEditUserDialog, this::onViewLoans))
                 .toList();
     }
 

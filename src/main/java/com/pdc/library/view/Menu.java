@@ -1,13 +1,14 @@
 package com.pdc.library.view;
 
 import com.pdc.library.util.Listener;
+import com.pdc.library.util.Navigate;
 
 import javax.swing.*;
 
 public class Menu extends JPanel {
-    protected Listener<MenuAction> listener;
+    protected Listener<Navigate> listener;
 
-    public Menu(Listener<MenuAction> listener) {
+    public Menu(Listener<Navigate> listener) {
         this.listener = listener;
     }
 }

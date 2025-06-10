@@ -30,6 +30,17 @@ public class LibDbRepository implements LibRepository {
         return users;
     }
 
+    private static List<UserBook> filterOverdueBooks(Collection<UserBook> ubs) {
+        return ubs.stream()
+                .filter(userBook -> {
+                    var c = java.util.Calendar.getInstance();
+                    c.setTime(userBook.getDateHired());
+                    c.add(java.util.Calendar.DATE, userBook.getAllowedDays());
+                    return c.getTime().after(java.util.Calendar.getInstance().getTime());
+                })
+                .toList();
+    }
+
     private List<Book> dummyBooks() {
         return List.of(
                 new Book(1, "Author A", "Book A"),
@@ -172,22 +183,11 @@ public class LibDbRepository implements LibRepository {
     public Collection<UserBook> findOverdueBooks() throws SQLException {
         var pstmt = connection.prepareStatement(LibSql.SELECT_ALL_USER_BOOKS);
         var resultSet = pstmt.executeQuery();
-        var uB =  parseUserBooks(resultSet);
+        var uB = parseUserBooks(resultSet);
         if (uB.isEmpty()) {
             return List.of();
         }
         return filterOverdueBooks(uB);
-    }
-
-    private static List<UserBook> filterOverdueBooks(Collection<UserBook> ubs) {
-        return ubs.stream()
-                .filter(userBook -> {
-                    var c = java.util.Calendar.getInstance();
-                    c.setTime(userBook.getDateHired());
-                    c.add(java.util.Calendar.DATE, userBook.getAllowedDays());
-                    return c.getTime().after(java.util.Calendar.getInstance().getTime());
-                })
-                .toList();
     }
 
     @Override
