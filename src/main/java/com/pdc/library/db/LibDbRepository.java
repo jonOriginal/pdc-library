@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 public class LibDbRepository implements LibRepository {
     private final Connection connection;
@@ -21,70 +22,76 @@ public class LibDbRepository implements LibRepository {
 
     private List<Book> dummyBooks() {
         return List.of(
-            new Book(1, "Author A", "Book A"),
-            new Book(2, "Author B", "Book B"),
-            new Book(3, "Author C", "Book C")
+                new Book(1, "Author A", "Book A"),
+                new Book(2, "Author B", "Book B"),
+                new Book(3, "Author C", "Book C")
         );
     }
 
     private List<User> dummyUsers() {
         return List.of(
-            new User(1, "User A"),
-            new User(2, "User B"),
-            new User(3, "User C")
+                new User(1, "User A"),
+                new User(2, "User B"),
+                new User(3, "User C")
         );
     }
 
     private List<UserBook> dummyUserBooks() {
         return List.of(
-            new UserBook(1, 1),
-            new UserBook(2, 2),
-            new UserBook(3, 3)
+                new UserBook(1, 1),
+                new UserBook(2, 2),
+                new UserBook(3, 3)
         );
     }
 
     public void createUserBookTable() throws SQLException {
-        // Implementation for creating the user_book table in the database
-        Statement statement = connection.createStatement();
-        if (statement.execute(LibSql.CREATE_USER_BOOK_TABLE)) {
+        var statement = connection.createStatement();
+        try {
+            statement.execute(LibSql.CREATE_USER_BOOK_TABLE);
             for (var userBook : dummyUserBooks()) {
                 addUserBook(userBook);
             }
-        } else {
-            System.out.println("User book table already exists.");
+        } catch (SQLException e) {
+            if (Objects.equals(e.getSQLState(), "X0Y32")) {
+                return;
+            }
+            throw e;
         }
     }
 
     public void createBookTable() throws SQLException {
-        // Implementation for creating the book table in the database
-        Statement statement = connection.createStatement();
-        if (statement.execute(LibSql.CREATE_BOOK_TABLE)) {
-            for (var book : dummyBooks() ) {
+        var statement = connection.createStatement();
+        try {
+            statement.execute(LibSql.CREATE_BOOK_TABLE);
+            for (var book : dummyBooks()) {
                 addBook(book);
             }
-        } else {
-            System.out.println("Book table already exists.");
+        } catch (SQLException e) {
+            if (Objects.equals(e.getSQLState(), "X0Y32")) {
+                return;
+            }
+            throw e;
         }
     }
 
     public void createUserTable() throws SQLException {
-        // Implementation for creating the user table in the database
-        Statement statement = connection.createStatement();
-        if (statement.execute(LibSql.CREATE_USER_TABLE)) {
+        var statement = connection.createStatement();
+        try {
+            statement.execute(LibSql.CREATE_USER_TABLE);
             for (var user : dummyUsers()) {
                 addUser(user);
             }
-        } else {
-            System.out.println("User table already exists.");
+        } catch (SQLException e) {
+            if (Objects.equals(e.getSQLState(), "X0Y32")) {
+                return;
+            }
+            throw e;
         }
     }
 
     @Override
     public void addUserBook(UserBook userBook) throws SQLException {
-        String insertSQL = "";
-        var pstmt = connection.prepareStatement(insertSQL);
-
-        // Inserted values:
+        var pstmt = connection.prepareStatement(LibSql.INSERT_USER_BOOK);
         pstmt.setInt(1, userBook.getUserId());
         pstmt.setInt(2, userBook.getBookId());
         pstmt.setDate(3, userBook.getDateHired());
@@ -93,9 +100,8 @@ public class LibDbRepository implements LibRepository {
 
     @Override
     public void removeUserBook(int bookId) throws SQLException {
-        String deleteSQL = "DELETE FROM " + LibSql.USER_BOOK_TABLE_NAME + " WHERE BookID = '?'";
-        var pstmt = connection.prepareStatement(deleteSQL);
-        pstmt.setInt(1,bookId);
+        var pstmt = connection.prepareStatement(LibSql.DELETE_USER_BOOK);
+        pstmt.setInt(1, bookId);
         pstmt.executeUpdate();
     }
 
@@ -121,10 +127,7 @@ public class LibDbRepository implements LibRepository {
 
     @Override
     public void addBook(Book book) throws SQLException {
-        String insertSQL = "INSERT INTO " + LibSql.BOOK_TABLE_NAME + "(BookID, BookAuthor, BookName) VALUES(?, ?, ?)";
-        PreparedStatement pstmt = connection.prepareStatement(insertSQL);
-
-        // Inserted values:
+        var pstmt = connection.prepareStatement(LibSql.INSERT_BOOK);
         pstmt.setInt(1, book.getId());
         pstmt.setString(2, book.getAuthor());
         pstmt.setString(3, book.getName());
@@ -133,8 +136,7 @@ public class LibDbRepository implements LibRepository {
 
     @Override
     public void removeBook(int bookId) throws SQLException {
-        String deleteSQL = "DELETE FROM " + LibSql.BOOK_TABLE_NAME + " WHERE BookID = '?'";
-        PreparedStatement pstmt = connection.prepareStatement(deleteSQL);
+        var pstmt = connection.prepareStatement(LibSql.DELETE_BOOK);
         pstmt.setInt(1, bookId);
         pstmt.executeUpdate();
     }
@@ -145,8 +147,22 @@ public class LibDbRepository implements LibRepository {
     }
 
     @Override
-    public Collection<Book> findBookByTitle(String title) {
-        return List.of();
+    public Collection<Book> findBookByTitle(String title) throws SQLException {
+        var pstmt = connection.prepareStatement(LibSql.FIND_BOOK_BY_TITLE);
+        pstmt.setString(1, "%" + title + "%");
+        return getBooks(pstmt);
+    }
+
+    private Collection<Book> getBooks(PreparedStatement pstmt) throws SQLException {
+        var resultSet = pstmt.executeQuery();
+        List<Book> books = new java.util.ArrayList<>();
+        while (resultSet.next()) {
+            int id = resultSet.getInt("BookID");
+            String author = resultSet.getString("BookAuthor");
+            String name = resultSet.getString("BookName");
+            books.add(new Book(id, author, name));
+        }
+        return books;
     }
 
     @Override
@@ -156,10 +172,7 @@ public class LibDbRepository implements LibRepository {
 
     @Override
     public void addUser(User user) throws SQLException {
-        String insertSQL = "INSERT INTO " + LibSql.USER_TABLE_NAME + "(UserID, UserName) VALUES(?, ?)";
-        PreparedStatement pstmt = connection.prepareStatement(insertSQL);
-
-        // Inserted values:
+        var pstmt = connection.prepareStatement(LibSql.INSERT_USER);
         pstmt.setInt(1, user.getId());
         pstmt.setString(2, user.getName());
         pstmt.executeUpdate();
@@ -168,7 +181,7 @@ public class LibDbRepository implements LibRepository {
     @Override
     public void removeUser(int userId) throws SQLException {
         String deleteSQL = "DELETE FROM " + LibSql.USER_TABLE_NAME + " WHERE UserID = '?'";
-        PreparedStatement pstmt = connection.prepareStatement(deleteSQL);
+        var pstmt = connection.prepareStatement(deleteSQL);
         pstmt.setInt(1, userId);
         pstmt.executeUpdate();
     }
@@ -185,6 +198,13 @@ public class LibDbRepository implements LibRepository {
 
     @Override
     public Collection<Book> findAllBooks() {
-        return null;
+        try {
+            String selectSQL = "SELECT * FROM " + LibSql.BOOK_TABLE_NAME;
+            var pstmt = connection.prepareStatement(selectSQL);
+            return getBooks(pstmt);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return List.of();
+        }
     }
 }
