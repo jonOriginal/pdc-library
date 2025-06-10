@@ -5,10 +5,7 @@ import com.pdc.library.models.Book;
 import com.pdc.library.models.User;
 import com.pdc.library.models.UserBook;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -43,25 +40,29 @@ public class LibDbRepository implements LibRepository {
 
     private List<Book> dummyBooks() {
         return List.of(
-                new Book(1, "Author A", "Book A"),
-                new Book(2, "Author B", "Book B"),
-                new Book(3, "Author C", "Book C")
+                new Book(1, "The Catcher in the Rye", "J.D. Salinger"),
+                new Book(2, "To Kill a Mockingbird", "Harper Lee"),
+                new Book(3, "1984", "George Orwell"),
+                new Book(4, "The Great Gatsby", "F. Scott Fitzgerald")
         );
     }
 
     private List<User> dummyUsers() {
         return List.of(
-                new User(1, "User A"),
-                new User(2, "User B"),
-                new User(3, "User C")
+                new User(1, "Alice Smith"),
+                new User(2, "Bob Johnson"),
+                new User(3, "Charlie Brown"),
+                new User(4, "Diana Prince"),
+                new User(5, "Ethan Hunt"),
+                new User(6, "Fiona Gallagher")
         );
     }
 
     private List<UserBook> dummyUserBooks() {
         return List.of(
-                UserBook.create(1, 1, 7),
-                UserBook.create(2, 2, 7),
-                UserBook.create(3, 3, 7)
+                new UserBook(1, 1, Date.valueOf("2025-06-01"), 1, "The Catcher in the Rye", "J.D. Salinger", "Alice Smith"),
+                new UserBook(2, 2, Date.valueOf("2025-06-01"), 2, "To Kill a Mockingbird", "Harper Lee", "Bob Johnson"),
+                new UserBook(3, 3, Date.valueOf("2025-06-01"), 20, "1984", "George Orwell", "Charlie Brown")
         );
     }
 

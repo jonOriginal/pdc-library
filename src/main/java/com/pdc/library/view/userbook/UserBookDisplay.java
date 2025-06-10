@@ -4,7 +4,9 @@ import com.pdc.library.models.UserBook;
 
 import javax.swing.*;
 import java.awt.*;
+import java.time.LocalDate;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.function.Consumer;
 
 public class UserBookDisplay extends JPanel {
@@ -37,7 +39,7 @@ public class UserBookDisplay extends JPanel {
         var returnDateLabel = new JLabel("Return Date: " + formattedReturnDate);
         returnDateLabel.setFont(new Font("Arial", Font.ITALIC, 14));
 
-        if (returnDate.after(Calendar.getInstance().getTime())) {
+        if (returnDate.before(Date.from(LocalDate.now().atStartOfDay().toInstant(java.time.ZoneOffset.UTC)))) {
             returnDateLabel.setForeground(Color.RED);
         }
 
