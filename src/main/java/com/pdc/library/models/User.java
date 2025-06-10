@@ -13,6 +13,10 @@ public class User {
         return Id;
     }
 
+    public void setUserId(int newUserId) {
+        this.Id = newUserId;
+    }
+
     public String getName() {
         return Name;
     }

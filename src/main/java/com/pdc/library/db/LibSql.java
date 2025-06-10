@@ -18,7 +18,7 @@ public class LibSql {
                                                    "UserID int NOT NULL," +
                                                    "UserName VAR(255)," +
                                                    "PRIMARY KEY (BookID)" +
-                                                   ");";+
+                                                   ")";
 
     public static final String CREATE_USER_BOOK_TABLE = "CREATE TABLE IF NOT EXISTS " + USER_BOOK_TABLE_NAME + " (" +
                                                         "UserID int," +
