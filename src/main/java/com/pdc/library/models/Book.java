@@ -2,36 +2,36 @@ package com.pdc.library.models;
 
 public class Book {
     private int Id;
-    private String bookAuthor;
-    private String bookName;
+    private String author;
+    private String name;
 
-    public Book() {
-        this.Id = 0;
-        this.bookAuthor = "";
-        this.bookName = "";
+    public Book(int id, String author, String name) {
+        this.Id = id;
+        this.author = author;
+        this.name = name;
     }
 
     public int getId() {
         return Id;
     }
 
-    public void setId(int newBookID) {
-       this.Id = newBookID;
+    public void setId(int id) {
+       this.Id = id;
     }
 
-    public String getBookAuthor() {
-       return bookAuthor;
+    public String getAuthor() {
+       return author;
     }
 
-    public void setBookAuthor(String newBookAuthor) {
-        this.bookAuthor = newBookAuthor;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
-    public String getBookName() {
-        return bookName;
+    public String getName() {
+        return name;
     }
 
-    public void setBookName(String newBookName) {
-        this.bookName = newBookName;
+    public void setName(String name) {
+        this.name = name;
     }
 }

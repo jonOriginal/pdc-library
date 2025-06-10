@@ -1,15 +1,14 @@
 package com.pdc.library.models;
 
-import java.time.LocalDate;
 import java.sql.Date;
+import java.time.LocalDate;
 
 public class UserBook {
     private final int UserId;
     private final int BookId;
     private Book book;
     private User user;
-    private LocalDate localDateHired;
-    private Date dateHired = Date.valueOf(localDateHired);
+    private Date dateHired;
 
     public UserBook(int userId, int bookId) {
         this.UserId = userId;
