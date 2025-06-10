@@ -3,10 +3,9 @@ package com.pdc.library.view.userbook;
 import com.pdc.library.db.interfaces.LibRepository;
 import com.pdc.library.models.UserBook;
 import com.pdc.library.util.Listener;
+import com.pdc.library.util.Navigate;
 import com.pdc.library.view.Menu;
 import com.pdc.library.view.MenuAction;
-import com.pdc.library.view.SearchBar;
-import com.pdc.library.view.user.UserDisplay;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,11 +16,12 @@ import java.util.List;
 public class UserBookMenu extends Menu {
     private final LibRepository repo;
     private final JPanel userBookPanel;
+    private final JLabel searchLabel;
 
-    public UserBookMenu(Listener<MenuAction> menuListener, LibRepository repository) {
+    public UserBookMenu(Listener<Navigate> menuListener, LibRepository repository, String path) {
         super(menuListener);
         this.repo = repository;
-
+        this.searchLabel = new JLabel();
         this.setLayout(new BorderLayout());
         this.userBookPanel = new JPanel();
         userBookPanel.setLayout(new BoxLayout(userBookPanel, BoxLayout.Y_AXIS));
@@ -31,18 +31,76 @@ public class UserBookMenu extends Menu {
         scrollBox.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollBox.setAlignmentX(LEFT_ALIGNMENT);
 
-        List<UserBookDisplay> userBookPanels = null;
-        try {
-            userBookPanels = getUserBookPanel(repository.findAllUserBooks());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
         var controlsPanel = getControlsPanel();
-
         this.add(controlsPanel, BorderLayout.NORTH);
         this.add(scrollBox, BorderLayout.CENTER);
-        setUserBooks(userBookPanels);
+
+        if (path != null && !path.isEmpty()) {
+            NavigateTo(path);
+        } else {
+            clear();
+        }
+    }
+
+    private void NavigateTo(String path) {
+        var firstPart = path.split("/")[0];
+        var id = path.split("/").length > 1 ? path.split("/")[1] : null;
+        try {
+            if (id != null) {
+                Integer.parseInt(id);
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Invalid ID format.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (firstPart.equals("users")) {
+            if (id != null) {
+                filterByUser(Integer.parseInt(id));
+            } else {
+                listener.onEvent(Navigate.targetless(MenuAction.USERS));
+            }
+        } else if (firstPart.equals("books")) {
+            if (id != null) {
+                filterByBook(Integer.parseInt(id));
+            } else {
+                listener.onEvent(Navigate.targetless(MenuAction.BOOKS));
+            }
+        }
+    }
+
+    private void filterByUser(int userId) {
+        try {
+            var userBooks = repo.findUserBooksByUserId(userId);
+            if (userBooks.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No loans found for this user.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                clear();
+            } else {
+                var userBookDisplays = getUserBookPanel(userBooks);
+                setUserBooks(userBookDisplays);
+                searchLabel.setText("Showing loans for user ID: " + userId);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error fetching user books: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Invalid User ID format.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void filterByBook(int bookId) {
+        try {
+            var userBook = repo.findUserBookByBookId(bookId);
+            if (userBook == null) {
+                JOptionPane.showMessageDialog(this, "No loans found for this book.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                var userBookDisplays = getUserBookPanel(List.of(userBook));
+                setUserBooks(userBookDisplays);
+                searchLabel.setText("Showing loans for book ID: " + bookId);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error fetching user books: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Invalid Book ID format.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private JPanel getControlsPanel() {
@@ -50,7 +108,7 @@ public class UserBookMenu extends Menu {
 
         var backButton = new JButton("Back");
         backButton.addActionListener(e -> {
-            listener.onEvent(MenuAction.HOME);
+            listener.onEvent(Navigate.targetless(MenuAction.HOME));
         });
 
         var addButton = new JButton("Lend Book");
@@ -59,12 +117,13 @@ public class UserBookMenu extends Menu {
         var findOverdueButton = new JButton("Find Overdue");
         findOverdueButton.addActionListener(e -> findOverdueBooks());
 
-
+        searchLabel.setText("Showing all active loans");
 
         controlsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         controlsPanel.add(backButton);
         controlsPanel.add(addButton);
         controlsPanel.add(findOverdueButton);
+        controlsPanel.add(searchLabel);
 
         return controlsPanel;
     }
@@ -77,6 +136,7 @@ public class UserBookMenu extends Menu {
             } else {
                 var overdueBookDisplays = getUserBookPanel(overdueBooks);
                 setUserBooks(overdueBookDisplays);
+                searchLabel.setText("Showing overdue loans");
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error fetching overdue books: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -92,6 +152,7 @@ public class UserBookMenu extends Menu {
         try {
             var userBookDisplays = getUserBookPanel(repo.findAllUserBooks());
             setUserBooks(userBookDisplays);
+            searchLabel.setText("Showing all active loans");
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error fetching userBooks: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }

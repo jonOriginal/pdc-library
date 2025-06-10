@@ -5,14 +5,13 @@ import java.time.LocalDate;
 
 public class UserBook {
     private final int BookId;
-    private String bookTitle;
-    private String bookAuthor;
-
     private final int UserId;
-    private String userName;
+    private final String bookTitle;
+    private final String bookAuthor;
+    private final String userName;
 
-    private Date dateHired;
-    private int allowedDays;
+    private final Date dateHired;
+    private final int allowedDays;
 
     public UserBook(int userId, int bookId, Date dateHired, int allowedDays, String bookTitle, String bookAuthor, String userName) {
         this.UserId = userId;

@@ -10,7 +10,6 @@ public class Controller {
     }
 
     public void getBooks() {
-        return;
     }
 
 

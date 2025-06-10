@@ -1,17 +1,16 @@
-import com.pdc.library.view.book.BookMenu;
-import com.pdc.library.view.MainMenu;
-import com.pdc.library.view.MenuAction;
 import com.pdc.library.util.Listener;
+import com.pdc.library.util.Navigate;
+import com.pdc.library.view.MainMenu;
+import com.pdc.library.view.book.BookMenu;
 import com.pdc.library.view.user.UserMenu;
-import com.pdc.library.view.userbook.UserBookDisplay;
 import com.pdc.library.view.userbook.UserBookMenu;
 
 import javax.swing.*;
 
-public class View extends JFrame implements Listener<MenuAction> {
+public class View extends JFrame implements Listener<Navigate> {
 
-    private JPanel currentPanel;
     private final Controller controller;
+    private JPanel currentPanel;
 
     public View(Controller c) {
         this.controller = c;
@@ -23,8 +22,8 @@ public class View extends JFrame implements Listener<MenuAction> {
     }
 
     @Override
-    public void onEvent(MenuAction event) {
-        switch (event) {
+    public void onEvent(Navigate event) {
+        switch (event.targetMenu()) {
             case EXIT -> System.exit(0);
             case USERS -> {
                 setCurrentPanel(new UserMenu(this, controller.repository));
@@ -33,7 +32,7 @@ public class View extends JFrame implements Listener<MenuAction> {
                 setCurrentPanel(new BookMenu(this, controller.repository));
             }
             case LOANS -> {
-                setCurrentPanel(new UserBookMenu(this, controller.repository));
+                setCurrentPanel(new UserBookMenu(this, controller.repository, event.path()));
             }
             case HOME -> {
                 setCurrentPanel(new MainMenu(this));
