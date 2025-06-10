@@ -1,0 +1,39 @@
+<project name="RunTestSql" default="run-TestSql" basedir=".">
+
+    <!-- Directory locations -->
+    <property name="main.classes" value="build/classes"/>
+    <property name="test.src"     value="src/test/java"/>
+    <property name="test.build"   value="build/test-classes"/>
+
+    <!-- Create test build directory -->
+    <target name="init">
+        <mkdir dir="${test.build}"/>
+    </target>
+
+    <!-- Compile TestSql.java only -->
+    <target name="compile-TestSql" depends="init">
+        <javac srcdir="${test.src}" destdir="${test.build}" includeantruntime="false">
+            <include name="TestSql.java"/>
+            <classpath>
+                <pathelement path="${main.classes}"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <!-- Run TestSql -->
+    <target name="run-TestSql" depends="compile-TestSql">
+        <java classname="TestSql" fork="true">
+            <classpath>
+                <pathelement path="${test.build}"/>
+                <pathelement path="${main.classes}"/>
+            </classpath>
+        </java>
+    </target>
+
+    <!-- Clean test build directory -->
+    <target name="clean">
+        <delete dir="${test.build}"/>
+    </target>
+
+</project>
+

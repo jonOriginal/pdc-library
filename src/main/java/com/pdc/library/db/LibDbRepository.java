@@ -49,6 +49,7 @@ public class LibDbRepository implements LibRepository {
         pstmt.executeUpdate();
     }
 
+    @Override
     public void removeUserBook(int bookId) throws SQLException {
         String deleteSQL = "DELETE FROM " + LibSql.USER_BOOK_TABLE_NAME + " WHERE BookID = '?'";
         var pstmt = connection.prepareStatement(deleteSQL);
@@ -83,8 +84,8 @@ public class LibDbRepository implements LibRepository {
 
         // Inserted values:
         pstmt.setInt(1, book.getId());
-        pstmt.setString(2, book.getAuthor());
-        pstmt.setString(3, book.getName());
+        pstmt.setString(2, book.getBookAuthor());
+        pstmt.setString(3, book.getBookName());
         pstmt.executeUpdate();
     }
 
@@ -117,7 +118,7 @@ public class LibDbRepository implements LibRepository {
         PreparedStatement pstmt = connection.prepareStatement(insertSQL);
 
         // Inserted values:
-        pstmt.setInt(1, user.getId());
+        pstmt.setInt(1, user.getUserId());
         pstmt.setString(2, user.getName());
         pstmt.executeUpdate();
     }
@@ -138,5 +139,10 @@ public class LibDbRepository implements LibRepository {
     @Override
     public Collection<User> findUserByName(String name) {
         return List.of();
+    }
+
+    @Override
+    public Collection<Book> findAllBooks() {
+        return null;
     }
 }
