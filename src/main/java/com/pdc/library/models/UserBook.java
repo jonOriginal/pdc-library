@@ -4,15 +4,27 @@ import java.sql.Date;
 import java.time.LocalDate;
 
 public class UserBook {
-    private final int UserId;
     private final int BookId;
-    private Book book;
-    private User user;
-    private Date dateHired;
+    private final int UserId;
+    private final String bookTitle;
+    private final String bookAuthor;
+    private final String userName;
 
-    public UserBook(int userId, int bookId) {
+    private final Date dateHired;
+    private final int allowedDays;
+
+    public UserBook(int userId, int bookId, Date dateHired, int allowedDays, String bookTitle, String bookAuthor, String userName) {
         this.UserId = userId;
         this.BookId = bookId;
+        this.dateHired = dateHired;
+        this.allowedDays = allowedDays;
+        this.bookTitle = bookTitle;
+        this.bookAuthor = bookAuthor;
+        this.userName = userName;
+    }
+
+    public static UserBook create(int userId, int bookId, int allowedDays) {
+        return new UserBook(userId, bookId, Date.valueOf(LocalDate.now()), allowedDays, null, null, null);
     }
 
     public int getUserId() {
@@ -23,15 +35,23 @@ public class UserBook {
         return BookId;
     }
 
-    public Book getBook() {
-        return book;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
     public Date getDateHired() {
         return dateHired;
+    }
+
+    public String getBookTitle() {
+        return bookTitle;
+    }
+
+    public String getBookAuthor() {
+        return bookAuthor;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public int getAllowedDays() {
+        return allowedDays;
     }
 }
