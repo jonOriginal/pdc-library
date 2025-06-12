@@ -46,7 +46,7 @@ public class DBTest {
     // proving that the removal of values is constant.
     @Test
     public void testRemoveUserBook() throws SQLException {
-        assertTrue(repository.findUserBooksByUserId(1).size() > 0);
+        assertFalse(repository.findUserBooksByUserId(1).isEmpty());
 
         repository.removeUserBook(1);
         assertTrue(repository.findUserBooksByUserId(1).isEmpty());
