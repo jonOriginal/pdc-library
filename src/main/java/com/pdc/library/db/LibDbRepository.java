@@ -66,22 +66,7 @@ public class LibDbRepository implements LibRepository {
         );
     }
 
-    public void createUserBookTable() throws SQLException {
-        var statement = connection.createStatement();
-        try {
-            statement.execute(LibSql.CREATE_USER_BOOK_TABLE);
-            for (var userBook : dummyUserBooks()) {
-                addUserBook(userBook);
-            }
-        } catch (SQLException e) {
-            if (Objects.equals(e.getSQLState(), "X0Y32")) {
-                return;
-            }
-            throw e;
-        }
-    }
-
-    public void createBookTable() throws SQLException {
+      public void createBookTable() throws SQLException {
         var statement = connection.createStatement();
         try {
             statement.execute(LibSql.CREATE_BOOK_TABLE);
@@ -110,7 +95,21 @@ public class LibDbRepository implements LibRepository {
             throw e;
         }
     }
-
+   
+    public void createUserBookTable() throws SQLException {
+        var statement = connection.createStatement();
+        try {
+            statement.execute(LibSql.CREATE_USER_BOOK_TABLE);
+            for (var userBook : dummyUserBooks()) {
+                addUserBook(userBook);
+            }
+        } catch (SQLException e) {
+            if (Objects.equals(e.getSQLState(), "X0Y32")) {
+                return;
+            }
+            throw e;
+        }
+    }
     @Override
     public void addUserBook(UserBook userBook) throws SQLException {
         var pstmt = connection.prepareStatement(LibSql.INSERT_USER_BOOK);
