@@ -1,7 +1,5 @@
 package com.pdc.library.util;
 
-import java.util.function.Function;
-
 public class Validation {
 
     private Validation() {

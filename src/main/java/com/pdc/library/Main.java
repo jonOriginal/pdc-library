@@ -1,3 +1,5 @@
+package com.pdc.library;
+
 import com.pdc.library.db.LibDbRepository;
 
 import java.sql.DriverManager;

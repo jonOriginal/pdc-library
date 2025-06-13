@@ -66,7 +66,7 @@ public class LibDbRepository implements LibRepository {
         );
     }
 
-      public void createBookTable() throws SQLException {
+    public void createBookTable() throws SQLException {
         var statement = connection.createStatement();
         try {
             statement.execute(LibSql.CREATE_BOOK_TABLE);
@@ -95,7 +95,7 @@ public class LibDbRepository implements LibRepository {
             throw e;
         }
     }
-   
+
     public void createUserBookTable() throws SQLException {
         var statement = connection.createStatement();
         try {
@@ -110,6 +110,7 @@ public class LibDbRepository implements LibRepository {
             throw e;
         }
     }
+
     @Override
     public void addUserBook(UserBook userBook) throws SQLException {
         var pstmt = connection.prepareStatement(LibSql.INSERT_USER_BOOK);
