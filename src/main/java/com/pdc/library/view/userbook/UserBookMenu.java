@@ -117,6 +117,9 @@ public class UserBookMenu extends Menu {
         var findOverdueButton = new JButton("Find Overdue");
         findOverdueButton.addActionListener(e -> findOverdueBooks());
 
+        var clearButton = new JButton("Clear");
+        clearButton.addActionListener(e -> clear());
+
         searchLabel.setText("Showing all active loans");
 
         controlsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -124,6 +127,8 @@ public class UserBookMenu extends Menu {
         controlsPanel.add(addButton);
         controlsPanel.add(findOverdueButton);
         controlsPanel.add(searchLabel);
+        controlsPanel.add(clearButton);
+
 
         return controlsPanel;
     }

@@ -39,9 +39,7 @@ public class UserBookDisplay extends JPanel {
         var returnDateLabel = new JLabel("Return Date: " + formattedReturnDate);
         returnDateLabel.setFont(new Font("Arial", Font.ITALIC, 14));
 
-        if (returnDate.before(Date.from(LocalDate.now().atStartOfDay().toInstant(java.time.ZoneOffset.UTC)))) {
-            returnDateLabel.setForeground(Color.RED);
-        }
+        returnDateLabel.setForeground(returnDate.before(new Date()) ? Color.RED : Color.GREEN);
 
         var deleteButton = new JButton("Delete");
         deleteButton.addActionListener(e -> deleteAction.accept(userBook));

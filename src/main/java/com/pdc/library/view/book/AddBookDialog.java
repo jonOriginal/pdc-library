@@ -1,6 +1,7 @@
 package com.pdc.library.view.book;
 
 import com.pdc.library.models.Book;
+import com.pdc.library.util.Validation;
 
 import javax.swing.*;
 import java.util.function.Consumer;
@@ -36,16 +37,12 @@ public class AddBookDialog extends JDialog {
         add(panel);
     }
 
-    private void onSubmit(Consumer<Book> onBookAdded, JTextField titleField, JTextField authorField, JTextField idField) {
+    private void onSubmit(Consumer<Book> onBookAdded, JTextField titleField, JTextField authorField, JTextField idField) throws NumberFormatException {
         var title = titleField.getText();
         var author = authorField.getText();
         var id = idField.getText();
-        try {
-            Integer.parseInt(id);
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "ID must be a number.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+
+        Validation.ensureInteger(id);
 
         if (title.isEmpty() || author.isEmpty() || id.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill in all fields.");

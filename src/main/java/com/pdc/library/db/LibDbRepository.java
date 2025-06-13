@@ -33,17 +33,17 @@ public class LibDbRepository implements LibRepository {
                     var c = java.util.Calendar.getInstance();
                     c.setTime(userBook.getDateHired());
                     c.add(java.util.Calendar.DATE, userBook.getAllowedDays());
-                    return c.getTime().after(java.util.Calendar.getInstance().getTime());
+                    return c.getTime().before(new java.util.Date());
                 })
                 .toList();
     }
 
     private List<Book> dummyBooks() {
         return List.of(
-                new Book(1, "The Catcher in the Rye", "J.D. Salinger"),
-                new Book(2, "To Kill a Mockingbird", "Harper Lee"),
-                new Book(3, "1984", "George Orwell"),
-                new Book(4, "The Great Gatsby", "F. Scott Fitzgerald")
+                new Book(1, "J.D. Salinger", "The Catcher in the Rye"),
+                new Book(2, "Harper Lee", "To Kill a Mockingbird"),
+                new Book(3, "George Orwell", "1984"),
+                new Book(4, "F. Scott Fitzgerald", "The Great Gatsby")
         );
     }
 
@@ -116,6 +116,7 @@ public class LibDbRepository implements LibRepository {
         pstmt.setInt(1, userBook.getUserId());
         pstmt.setInt(2, userBook.getBookId());
         pstmt.setDate(3, userBook.getDateHired());
+        pstmt.setInt(4, userBook.getAllowedDays());
         pstmt.executeUpdate();
     }
 
@@ -129,10 +130,11 @@ public class LibDbRepository implements LibRepository {
     @Override
     public void updateUserBook(UserBook userBook) throws SQLException {
         var pstmt = connection.prepareStatement(LibSql.UPDATE_USER_BOOK);
-        pstmt.setInt(1, userBook.getUserId());
-        pstmt.setInt(2, userBook.getBookId());
-        pstmt.setDate(3, userBook.getDateHired());
+        pstmt.setDate(1, userBook.getDateHired());
         pstmt.setInt(4, userBook.getAllowedDays());
+        pstmt.setInt(2, userBook.getUserId());
+        pstmt.setInt(3, userBook.getBookId());
+
         pstmt.executeUpdate();
     }
 
@@ -227,8 +229,8 @@ public class LibDbRepository implements LibRepository {
     }
 
     @Override
-    public Collection<Book> findBookByTitle(String title) throws SQLException {
-        var pstmt = connection.prepareStatement(LibSql.FIND_BOOK_BY_TITLE);
+    public Collection<Book> findBookByTitleOrAuthor(String title) throws SQLException {
+        var pstmt = connection.prepareStatement(LibSql.FIND_BOOK_BY_TITLE_OR_AUTHOR);
         pstmt.setString(1, "%" + title + "%");
         return parseBooks(pstmt);
     }

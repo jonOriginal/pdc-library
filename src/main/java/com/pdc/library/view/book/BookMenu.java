@@ -144,7 +144,7 @@ public class BookMenu extends Menu {
 
     private void onSearch(String query) {
         try {
-            var bookPanels = getBookPanels(repository.findBookByTitle(query));
+            var bookPanels = getBookPanels(repository.findBookByTitleOrAuthor(query));
             if (bookPanels.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "No books found for the search term: " + query, "Search Result", JOptionPane.INFORMATION_MESSAGE);
             } else {

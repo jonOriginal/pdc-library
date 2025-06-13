@@ -1,6 +1,7 @@
 package com.pdc.library.view.userbook;
 
 import com.pdc.library.models.UserBook;
+import com.pdc.library.util.Validation;
 
 import javax.swing.*;
 import java.util.function.Consumer;
@@ -15,12 +16,12 @@ public class LendBookDialog extends JDialog {
         setLocationRelativeTo(null);
         setModal(true);
 
-        JPanel panel = new JPanel();
+        var panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        JTextField bookIdField = new JTextField(20);
-        JTextField userIdField = new JTextField(20);
-        JTextField allowedDaysField = new JTextField(20);
+        var bookIdField = new JTextField(20);
+        var userIdField = new JTextField(20);
+        var allowedDaysField = new JTextField(20);
 
         panel.add(new JLabel("Book ID:"));
         panel.add(bookIdField);
@@ -29,26 +30,23 @@ public class LendBookDialog extends JDialog {
         panel.add(new JLabel("Allowed Days:"));
         panel.add(allowedDaysField);
 
-        JButton lendButton = new JButton("Lend Book");
+        var lendButton = new JButton("Lend Book");
         lendButton.addActionListener(e -> submit(bookIdField, userIdField, allowedDaysField));
 
         panel.add(lendButton);
         this.add(panel);
     }
 
-    private void submit(JTextField bookIdField, JTextField userIdField, JTextField allowedDaysField) {
+    private void submit(JTextField bookIdField, JTextField userIdField, JTextField allowedDaysField) throws NumberFormatException {
         if (bookIdField.getText().isEmpty() || userIdField.getText().isEmpty() || allowedDaysField.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
+            showInvalidInputMessage("Please fill in all fields.");
             return;
         }
-        try {
-            Integer.parseInt(bookIdField.getText());
-            Integer.parseInt(userIdField.getText());
-            Integer.parseInt(allowedDaysField.getText());
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Please enter valid numbers for Book ID, User ID, and Allowed Days.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+
+        Validation.ensureInteger(bookIdField.getText());
+        Validation.ensureInteger(userIdField.getText());
+        Validation.ensureInteger(allowedDaysField.getText());
+
         var ub = UserBook.create(
                 Integer.parseInt(bookIdField.getText()),
                 Integer.parseInt(userIdField.getText()),
@@ -57,5 +55,9 @@ public class LendBookDialog extends JDialog {
             addUserBook.accept(ub);
             this.dispose();
         }
+    }
+
+    private void showInvalidInputMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Invalid Input", JOptionPane.ERROR_MESSAGE);
     }
 }

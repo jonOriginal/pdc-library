@@ -1,6 +1,7 @@
 package com.pdc.library.view.user;
 
 import com.pdc.library.models.User;
+import com.pdc.library.util.Validation;
 
 import javax.swing.*;
 import java.util.function.Consumer;
@@ -33,15 +34,11 @@ public class AddUserDialog extends JDialog {
         add(panel);
     }
 
-    private void onSubmit(Consumer<User> onUserAdded, JTextField idField, JTextField nameField) {
+    private void onSubmit(Consumer<User> onUserAdded, JTextField idField, JTextField nameField) throws NumberFormatException {
         var name = nameField.getText();
         var id = idField.getText();
-        try {
-            Integer.parseInt(id);
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "ID must be a number.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+
+        Validation.ensureInteger(id);
 
         if (name.isEmpty() || id.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill in all fields.");

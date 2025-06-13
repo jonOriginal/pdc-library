@@ -16,5 +16,5 @@ public interface BookRepository {
 
     Book findBookById(int id) throws SQLException;
 
-    Collection<Book> findBookByTitle(String title) throws SQLException;
+    Collection<Book> findBookByTitleOrAuthor(String title) throws SQLException;
 }

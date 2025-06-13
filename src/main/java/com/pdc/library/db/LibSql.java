@@ -33,7 +33,7 @@ public class LibSql {
     public static final String DELETE_BOOK = "DELETE FROM " + BOOK_TABLE_NAME + " WHERE BookID = ?";
     public static final String SELECT_BOOK_BY_ID = "SELECT * FROM " + BOOK_TABLE_NAME + " WHERE BookID = ?";
     public static final String SELECT_USER_BY_ID = "SELECT * FROM " + USER_TABLE_NAME + " WHERE UserID = ?";
-    public static final String FIND_BOOK_BY_TITLE = "SELECT * FROM " + BOOK_TABLE_NAME + " WHERE UPPER(BookName) LIKE UPPER(?)";
+    public static final String FIND_BOOK_BY_TITLE_OR_AUTHOR = "SELECT * FROM " + BOOK_TABLE_NAME + " WHERE UPPER(BookName) LIKE UPPER(?) OR UPPER(BookAuthor) LIKE UPPER(?)";
     public static final String UPDATE_BOOK = "UPDATE " + BOOK_TABLE_NAME + " SET BookAuthor = ?, BookName = ? WHERE BookID = ?";
     // User Table Queries
     public static final String INSERT_USER =
@@ -45,8 +45,8 @@ public class LibSql {
     public static final String UPDATE_USER = "UPDATE " + USER_TABLE_NAME + " SET UserName = ? WHERE UserID = ?";
     // User-Book Table Queries
     public static final String INSERT_USER_BOOK =
-            "INSERT INTO " + USER_BOOK_TABLE_NAME + " (UserID, BookID, DateHired) VALUES (?, ?, ?)";
-    public static final String UPDATE_USER_BOOK = "UPDATE " + USER_BOOK_TABLE_NAME + " SET DateHired = ? WHERE UserID = ? AND BookID = ?";
+            "INSERT INTO " + USER_BOOK_TABLE_NAME + " (UserID, BookID, DateHired, AllowedDays) VALUES (?, ?, ?, ?)";
+    public static final String UPDATE_USER_BOOK = "UPDATE " + USER_BOOK_TABLE_NAME + " SET DateHired = ?, AllowedDays = ? WHERE UserID = ? AND BookID = ?";
     public static final String DELETE_USER_BOOK = "DELETE FROM " + USER_BOOK_TABLE_NAME + " WHERE BookID = ?";
     public static final String SELECT_USER_BOOKS_BY_USER_ID =
             "SELECT " + USER_BOOK_TABLE_NAME + ".*, " + BOOK_TABLE_NAME + ".BookName, " + BOOK_TABLE_NAME + ".BookAuthor, " + USER_TABLE_NAME + ".UserName " +
